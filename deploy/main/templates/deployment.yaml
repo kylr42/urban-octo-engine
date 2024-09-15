@@ -1,0 +1,106 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+spec:
+  replicas: {{ .Values.api.replicas }}
+  selector:
+    matchLabels:
+      app: main
+  template:
+    metadata:
+      labels:
+        app: main
+        istio: monitor
+        version: {{ .Values.base.tag }}
+    spec:
+      containers:
+        - name: api
+          image: {{ .Values.base.image }}:{{ .Values.base.tag }}
+          command:
+            - make
+            - run
+          ports:
+            - name: http
+              containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: api-config
+          env:
+            - name: APP_VERSION
+              value: {{ .Values.base.tag }}
+          resources:
+            requests:
+              memory: {{ .Values.api.resources.requests.memory }}
+              cpu: {{ .Values.api.resources.requests.cpu }}
+            limits:
+              memory: {{ .Values.api.resources.limits.memory }}
+              cpu: {{ .Values.api.resources.limits.cpu }}
+          readinessProbe:
+            initialDelaySeconds: 40
+            periodSeconds: 50
+            httpGet:
+              path: /health
+              port: 8000
+          livenessProbe:
+            initialDelaySeconds: 40
+            periodSeconds: 50
+            httpGet:
+              path: /health
+              port: 8000
+      imagePullSecrets:
+        - name: gitlab
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+spec:
+  replicas: {{ .Values.web.replicas }}
+  selector:
+    matchLabels:
+      app: main
+  template:
+    metadata:
+      labels:
+        app: main
+        istio: monitor
+        version: {{ .Values.base.tag }}
+    spec:
+      containers:
+        - name: web
+          image: {{ .Values.base.image }}:{{ .Values.base.tag }}
+          command:
+            - make
+            - run
+          ports:
+            - name: http
+              containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: web-config
+          env:
+            - name: APP_VERSION
+              value: {{ .Values.base.tag }}
+          resources:
+            requests:
+              memory: {{ .Values.web.resources.requests.memory }}
+              cpu: {{ .Values.web.resources.requests.cpu }}
+            limits:
+              memory: {{ .Values.web.resources.limits.memory }}
+              cpu: {{ .Values.web.resources.limits.cpu }}
+          readinessProbe:
+            initialDelaySeconds: 40
+            periodSeconds: 50
+            httpGet:
+              path: /health
+              port: 8000
+          livenessProbe:
+            initialDelaySeconds: 40
+            periodSeconds: 50
+            httpGet:
+              path: /health
+              port: 8000
+      imagePullSecrets:
+        - name: gitlab

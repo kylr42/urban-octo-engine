@@ -21,7 +21,7 @@ import environ
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env(
-    DEBUG=(bool, False),
+    DEBUG=(bool, True),
     SECRET_KEY=(str, 'django-insecure-b@(z@=jg#%kf=@@l^1g0)e(tuaa%qnxrofq6se1ws_76nkirkh'),
     ALLOWED_HOSTS=(list, []),
     DATABASE_URL=(str, 'sqlite:///db.sqlite3'),
@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     "corsheaders",
 
     # Apps
+    "products",
 ]
 
 MIDDLEWARE = [
@@ -108,6 +109,15 @@ DATABASES = {
     "default": env.db(),
 }
 
+# DRF settings: https://www.django-rest-framework.org/api-guide/settings/
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.BasicAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
+    ],
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 10,
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -131,9 +141,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-ru'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
 

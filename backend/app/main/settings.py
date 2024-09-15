@@ -10,26 +10,46 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import os
+
 from pathlib import Path
+from socket import gethostbyname, gethostname
+
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
+env = environ.Env(
+    DEBUG=(bool, False),
+    SECRET_KEY=(str, 'django-insecure-b@(z@=jg#%kf=@@l^1g0)e(tuaa%qnxrofq6se1ws_76nkirkh'),
+    ALLOWED_HOSTS=(list, []),
+    DATABASE_URL=(str, 'sqlite:///db.sqlite3'),
+    CSRF_COOKIE_SECURE=(bool, False),
+)
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-b@(z@=jg#%kf=@@l^1g0)e(tuaa%qnxrofq6se1ws_76nkirkh'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = []
+# SECURITY WARNING: define the correct hosts in production!
+ALLOWED_HOSTS = env('ALLOWED_HOSTS')
+try:
+    ALLOWED_HOSTS += [gethostname(), gethostbyname(gethostname())]
+except Exception as exc:
+    print(f"Error: {exc}. Run the server with ALLOWED_HOSTS environment variable")
 
+# CORS: Cross-Origin Resource Sharing settings
+# https://pypi.org/project/django-cors-headers/
+CORS_ALLOWED_ORIGINS = [
+    f"http://{host}" if DEBUG else f"https://{host}" for host in ALLOWED_HOSTS
+]
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -37,10 +57,21 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # DRF
+    "rest_framework",
+    # "rest_framework.authtoken",
+    # "rest_framework_simplejwt",
+
+    # CORS
+    "corsheaders",
+
+    # Apps
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -74,10 +105,7 @@ WSGI_APPLICATION = 'main.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    "default": env.db(),
 }
 
 

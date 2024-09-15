@@ -4,5 +4,5 @@ from .serializers import ProductSerializer
 
 
 class ProductListCreateView(generics.ListCreateAPIView):
-    queryset = Product.objects.all()
+    queryset = Product.objects.all().order_by("-created_at")
     serializer_class = ProductSerializer

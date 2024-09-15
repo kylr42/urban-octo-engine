@@ -1,5 +1,5 @@
 PROJECT_NAME = "urban-octo-engine"
-PROJECT_DIR = "app"
+PROJECT_DIR = app
 
 HOST ?= 127.0.0.1
 PORT ?= 8000
@@ -28,7 +28,7 @@ dev-deps: deps
 check: lint test
 
 test:
-	pytest -vvl $(TEST_ARGS)
+	@cd ${PROJECT_DIR} && python manage.py test
 
 lint: black pyright isort flake8 djlint
 

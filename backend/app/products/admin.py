@@ -8,7 +8,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_display = ["name", "price", "is_deleted", "created_at", "updated_at"]
     list_filter = ["is_deleted"]
     search_fields = ["name", "description"]
-    readonly_fields = ["created_at", "updated_at"]
+    readonly_fields = ["created_at", "updated_at", "is_deleted"]
     fieldsets = [
         (None, {"fields": ["name", "description", "price"]}),
         ("Meta", {"fields": ["is_deleted", "created_at", "updated_at"], "classes": ["collapse"]}),
@@ -20,4 +20,4 @@ class ProductAdmin(admin.ModelAdmin):
             obj.delete()
         self.message_user(request, "Удалено успешно")
 
-    delete_model.short_description = "Удалить выбранные товары"
+    delete_model.short_description = "Удалить выбранные товары (мягко)"

@@ -20,4 +20,5 @@ from django.urls import path, include
 urlpatterns = [
     path('sAxYz/', admin.site.urls),
     path('api/v1/', include('api.v1.urls')),
+    path('', include('django_prometheus.urls')),
 ]

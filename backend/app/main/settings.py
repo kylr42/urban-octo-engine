@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env(
     DEBUG=(bool, True),
     SECRET_KEY=(str, 'django-insecure-b@(z@=jg#%kf=@@l^1g0)e(tuaa%qnxrofq6se1ws_76nkirkh'),
-    ALLOWED_HOSTS=(list, []),
+    ALLOWED_HOSTS=(list, ['*']),
     DATABASE_URL=(str, 'sqlite:///db.sqlite3'),
     CSRF_COOKIE_SECURE=(bool, False),
 )
@@ -66,11 +66,15 @@ INSTALLED_APPS = [
     # CORS
     "corsheaders",
 
+    # Metrics
+    "django_prometheus",
+
     # Apps
     "products",
 ]
 
 MIDDLEWARE = [
+    'django_prometheus.middleware.PrometheusBeforeMiddleware',
     'django.middleware.security.SecurityMiddleware',
     "corsheaders.middleware.CorsMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -79,6 +83,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_prometheus.middleware.PrometheusAfterMiddleware',
 ]
 
 ROOT_URLCONF = 'main.urls'
@@ -159,3 +164,6 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Metrics
+PROMETHEUS_EXPORT_MIGRATIONS = True
